@@ -1,6 +1,6 @@
 {
   "name": "magpie-multicodex",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Manage independent Codex homes from one page in Magpie",
   "type": "module",
   "main": "./index.mjs",

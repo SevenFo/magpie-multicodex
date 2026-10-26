@@ -18,12 +18,15 @@ function render() {
   for (const item of state.instances) {
     const card = element("article", undefined, "instance"); card.dataset.instance = item.id;
     const top = element("div", undefined, "instance-top");
-    top.append(element("h2", item.name));
+    const icon = element("span", "›_", "agent-icon"); icon.setAttribute("aria-hidden", "true");
+    const identity = element("div", undefined, "identity");
+    identity.append(element("h2", item.name), element("code", item.home, "home"));
+    top.append(icon, identity);
     const toggle = element("button", item.enabled ? text.managed : text.original, "switch");
     toggle.type = "button"; toggle.setAttribute("role", "switch"); toggle.setAttribute("aria-checked", String(item.enabled)); toggle.setAttribute("aria-label", item.name+" · "+text.managed);
     toggle.addEventListener("click", () => send("toggle", { id: item.id, enabled: !item.enabled }));
-    top.append(toggle); card.append(top, element("code", item.home, "home"));
-    const label = element("label", text.model), select = element("select");
+    const label = element("label", undefined, "model-field"), select = element("select");
+    label.append(element("span", text.model));
     select.setAttribute("aria-label", item.name+" · "+text.model);
     const initial = element("option", text.choose); initial.value = ""; select.append(initial);
     const models = [...state.models];
@@ -32,10 +35,10 @@ function render() {
     for (const model of models) { const option = element("option", model.name); option.value = model.id; select.append(option); }
     select.value = current || "";
     select.addEventListener("change", () => { if (select.value) send("model", { id: item.id, model: select.value }); });
-    label.append(select); card.append(label);
+    label.append(select); top.append(label, toggle); card.append(top);
     const bottom = element("div", undefined, "bottom");
     bottom.append(element("code", item.launch, "launch"));
-    const actions = element("div");
+    const actions = element("div", undefined, "instance-actions");
     const rename = element("button", text.rename, "quiet"); rename.type = "button"; rename.addEventListener("click", () => edit(item));
     const remove = element("button", text.remove, "quiet"); remove.type = "button"; remove.addEventListener("click", () => send("remove", { id: item.id }));
     actions.append(rename, remove); bottom.append(actions); card.append(bottom); $("instances").append(card);

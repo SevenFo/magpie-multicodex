@@ -1,12 +1,14 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CXI for Magpie</title><link rel="stylesheet" href="style.css"><script src="_magpie/bridge.js"></script><script src="app.js" defer></script></head>
 <body><main>
-  <header><div><div class="eyebrow">CODEX HOMES</div><h1>CXI for Magpie</h1><p id="subtitle"></p></div><div class="toolbar"><button id="refresh"></button><button id="add" class="primary"></button></div></header>
+  <header><div class="heading"><h1>CXI for Magpie</h1><p id="subtitle"></p></div><div class="toolbar"><button id="refresh"></button><button id="add"></button></div></header>
   <p id="status" role="status" aria-live="polite"></p>
-  <section class="default-home"><span class="dot"></span><div><strong id="default-label"></strong><code id="default-path"></code></div><span id="default-note"></span></section>
-  <div id="instances"></div>
-  <p id="empty" hidden></p>
+  <section class="instance-list" aria-label="Codex">
+    <div class="default-home"><span class="agent-icon" aria-hidden="true">›_</span><div class="identity"><strong id="default-label"></strong><code id="default-path"></code></div><span id="default-note"></span></div>
+    <div id="instances"></div>
+    <p id="empty" hidden></p>
+  </section>
   <footer id="footer"></footer>
 </main>
-<dialog id="editor"><div id="instance-form"><h2 id="editor-title"></h2><label><span id="name-label"></span><input id="instance-name" name="name" required maxlength="60" autocomplete="off"></label><label id="path-row"><span>CODEX_HOME</span><input id="instance-home" name="home" placeholder="~/codex/work" autocomplete="off"></label><label id="create-row" class="check"><input id="instance-create" type="checkbox"><span id="create-label"></span></label><div class="dialog-actions"><button type="button" id="cancel"></button><button type="button" id="save" class="primary"></button></div></div></dialog>
+<dialog id="editor" aria-labelledby="editor-title"><div id="instance-form"><h2 id="editor-title"></h2><div class="editor-fields"><label><span id="name-label"></span><input id="instance-name" name="name" required maxlength="60" autocomplete="off"></label><label id="path-row"><span>CODEX_HOME</span><input id="instance-home" name="home" placeholder="~/codex/work" autocomplete="off"></label><label id="create-row" class="check"><input id="instance-create" type="checkbox"><span id="create-label"></span></label></div><div class="dialog-actions"><button type="button" id="cancel"></button><button type="button" id="save" class="primary"></button></div></div></dialog>
 </body></html>
