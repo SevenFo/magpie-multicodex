@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/SevenFo/cxi",
+  "version": "1.1.0",
+  "sha256": {
+    "cxi-core.sh": "911b12871832203330569596d5c565686bd463ec6d65100e2b0b91d0ace34fbd",
+    "cxi.bash": "0769cab3f957ec23116204b4ef332497e18068bbd2f7d8dacf04330f5cc12685",
+    "cxi.zsh": "453fc4e369fe9d09400945ef70cbcb4c889e0a0d97e984cda3e2a4535004d4d2",
+    "LICENSE": "a133debca423c1a714079e514d0f3e185ea014431e78aeed490b600794970ccf"
+  }
+}

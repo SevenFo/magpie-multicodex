@@ -1,0 +1,17 @@
+{
+  "name": "magpie-multicodex",
+  "version": "0.2.0",
+  "description": "Manage independent Codex homes from one page in Magpie",
+  "type": "module",
+  "main": "./index.mjs",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/SevenFo/magpie-multicodex.git" },
+  "keywords": ["magpie-plugin", "opencode", "opencode-plugin", "codex", "multicodex"],
+  "files": ["index.mjs", "multicodex", "page", "vendor", "README.md", "README.zh-CN.md", "LICENSE"],
+  "scripts": { "test": "python3 -m unittest discover -s tests -v" },
+  "magpie": {
+    "page": { "title": "CXI for Magpie", "file": "page/index.html", "icon": "page/icon.svg" },
+    "panels": [{ "slot": "agents", "title": "CXI for Magpie", "file": "page/panel.html" }],
+    "actions": [{ "id": "manage-instances", "menu": "agent", "title": "CXI for Magpie" }]
+  }
+}
