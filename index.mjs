@@ -6,6 +6,7 @@ import os from "node:os";
 // installed backend, with a file lock and receipt to prevent duplicate work.
 // No provider, credentials or model requests are intercepted by this plugin.
 export const MultiCodex = async () => {
+  if (process.env.MAGPIE_DRY_PROVIDERS) return {};
   const root = path.dirname(fileURLToPath(import.meta.url));
   const config = path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config"), "magpie");
   // Page option changes retire the Bun host. Keep the small file watcher

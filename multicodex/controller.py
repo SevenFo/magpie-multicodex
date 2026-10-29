@@ -78,6 +78,9 @@ class Controller:
             return exact
         if len(candidates) != 1:
             raise ValueError("Install one active MultiCodex plugin")
+        installed = Path(candidates[0]["spec"])
+        if installed.is_absolute() and installed.resolve() != self.package:
+            raise ValueError("This MultiCodex watcher was replaced by another package")
         return candidates[0]
 
     def adopt(self):
@@ -118,8 +121,14 @@ class Controller:
         for name in ("runtime.py", "hook.sh"):
             atomic(runtime/name, (self.package/"multicodex"/name).read_text())
         target.mkdir(parents=True, exist_ok=True, mode=0o700)
+        def relocatable(path):
+            try:
+                return "~/" + path.relative_to(Path.home()).as_posix()
+            except ValueError:
+                # Magpie declines previews for folders outside the user's home.
+                return str(path)
         descriptor = {"id": entry["id"], "name": "Codex · "+entry["name"], "bin": "codex",
-            "config": str(state), "format": "json", "model": "model", "dir": str(home),
+            "config": relocatable(state), "format": "json", "model": "model", "dir": relocatable(home),
             "notice": "Restart this instance to use the new selection."}
         source = "export const agent = "+json.dumps(descriptor, ensure_ascii=False)+";\n"
         source += 'export function connect({gateway}) { return {schema:1,baseURL:gateway.url.replace(/\\/+$/, "")+"/backend-api/codex",apiKey:gateway.key}; }\n'
@@ -245,7 +254,7 @@ class Controller:
             return "Removed registration; files and sessions are kept"
         raise ValueError("Unsupported action")
 
-    def process(self):
+    def process(self, refresh=False):
         self.db_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         lock = self.db_path.parent/"controller.lock"
         regular(lock)
@@ -262,8 +271,15 @@ class Controller:
             own = self.own_entry(registry)
             options = own.get("options", {})
             request = options.get("request")
-            if request is None and options.get("state"):
+            if request is None and options.get("state") and not refresh:
                 return
+            # The main Magpie agent card can change the adapter independently
+            # of this page. Re-enable must use its latest connected selection.
+            for entry in self.db["instances"]:
+                state = read_json(Path(entry["state"]), {})
+                if state.get("model") and state.get("baseURL") and state.get("apiKey"):
+                    entry["lastModel"] = state["model"]
+            self.save()
             if request is not None and (not isinstance(request, dict) or not re.fullmatch(r"[A-Za-z0-9_-]{8,80}", str(request.get("id", "")))):
                 raise ValueError("Invalid request identifier")
             rid = request["id"] if request else "initial"
@@ -303,16 +319,21 @@ class Controller:
             previous = None
             while source.exists() and source.stat().st_mtime_ns == version:
                 try:
-                    stamp = self.registry_path.stat().st_mtime_ns
+                    files = [self.registry_path] + [Path(entry["state"]) for entry in read_json(self.db_path, self.db)["instances"]]
+                    stamp = tuple((str(path), path.stat().st_mtime_ns if path.exists() else None) for path in files)
                     if stamp != previous:
                         self.own_entry(self.registry())
-                        self.process()
-                        previous = self.registry_path.stat().st_mtime_ns
+                        self.process(refresh=True)
+                        previous = tuple((str(path), path.stat().st_mtime_ns if path.exists() else None) for path in files)
                 except (FileNotFoundError, ValueError): return
                 time.sleep(.3)
 
 
 def main():
+    # Disconnect previews link plugin folders into a temporary HOME. Never
+    # run a state-mutating manager against those linked runtime directories.
+    if os.environ.get("MAGPIE_DRY_PROVIDERS"):
+        return
     parser = argparse.ArgumentParser(description="Independent Codex homes in Magpie")
     parser.add_argument("--config", type=Path)
     parser.add_argument("--package", type=Path)
